@@ -47,17 +47,17 @@ input.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums }
 input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px }
 input.bad, textarea.bad { border-color: var(--bad); background: var(--bad-soft) }
 .items { display: flex; flex-direction: column; gap: 8px }
-.items-h, .item { display: grid; grid-template-columns: 74px 1fr 200px 36px; gap: 8px; align-items: start }
+.items-h, .item { display: grid; grid-template-columns: 1fr 200px 74px 36px; gap: 8px; align-items: start }
 .items-h { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; padding: 0 2px }
 .item input.qty { text-align: center }
 .item .del { padding: 0; width: 36px; height: 40px; background: transparent; color: var(--muted); border: 1px solid var(--line); font-size: 18px; line-height: 1 }
 .item .del:hover { color: var(--bad); border-color: var(--bad) }
 @media (max-width: 620px) {
   .items-h { display: none }
-  .item { grid-template-columns: 74px 1fr 36px; padding: 10px; border: 1px solid var(--line); border-radius: 8px }
-  .item .desc { grid-column: 2 / 4; grid-row: 1 }
-  .item .qty { grid-column: 1; grid-row: 1 }
-  .item .med { grid-column: 1 / 3; grid-row: 2 }
+  .item { grid-template-columns: 1fr 74px 36px; padding: 10px; border: 1px solid var(--line); border-radius: 8px }
+  .item .desc { grid-column: 1 / 4; grid-row: 1 }
+  .item .med { grid-column: 1; grid-row: 2 }
+  .item .qty { grid-column: 2; grid-row: 2 }
   .item .del { grid-column: 3; grid-row: 2 }
 }
 .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
@@ -103,7 +103,7 @@ section.result { border-color: var(--accent); border-width: 1.5px }
   <section class="step">
     <div class="step-h"><span class="n">02</span><h2>Productos</h2><span class="hint">Una línea por producto. Las medidas van como texto libre (ej.: 180 × 90 × 75 cm).</span></div>
     <div class="items">
-      <div class="items-h"><span>Cant.</span><span>Descripción</span><span>Medidas</span><span></span></div>
+      <div class="items-h"><span>Descripción</span><span>Medidas</span><span>Cant.</span><span></span></div>
       <div id="items"></div>
     </div>
     <div class="row">
@@ -554,9 +554,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     it = it || {};
     var row = document.createElement("div");
     row.className = "item";
-    row.innerHTML = '<input class="qty mono" inputmode="numeric" aria-label="Cantidad" placeholder="1">' +
-      '<input class="desc" aria-label="Descripción" placeholder="Ej.: Mesa comedor petiribí">' +
+    row.innerHTML = '<input class="desc" aria-label="Descripción" placeholder="Ej.: Mesa comedor petiribí">' +
       '<input class="med" aria-label="Medidas" placeholder="Medidas">' +
+      '<input class="qty mono" inputmode="numeric" aria-label="Cantidad" placeholder="Cant.">' +
       '<button type="button" class="del" aria-label="Quitar producto" title="Quitar">×</button>';
     row.querySelector(".qty").value = it.cant || "";
     row.querySelector(".desc").value = it.desc || "";
@@ -637,10 +637,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     doc.addImage(LOGO, "PNG", M, y, lw, lh);
     doc.setTextColor.apply(doc, INK);
     doc.setFont("helvetica", "bold"); doc.setFontSize(15);
-    doc.text("EL CAMINO STUDIO", M + lw + 5, y + 9);
+    doc.text("EL CAMINO STUDIO", M + lw + 5, y + 6.5);
     doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor.apply(doc, MUTED);
-    doc.text("Muebles y diseño de interiores", M + lw + 5, y + 14.5);
-    doc.text("elcaminostudio.com", M + lw + 5, y + 19);
+    doc.text("Muebles y diseño de interiores", M + lw + 5, y + 11.5);
+    doc.text("Av. Liniers 3189, Tigre", M + lw + 5, y + 16);
+    doc.text("elcaminostudio.com", M + lw + 5, y + 20.5);
 
     var rx = W - M;
     doc.setTextColor.apply(doc, INK);
@@ -673,26 +674,26 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     var total = items.reduce(function (s, it) { var n = parseFloat(String(it.cant).replace(",", ".")); return s + (isFinite(n) ? n : 0); }, 0);
     doc.autoTable({
       startY: y, margin: { left: M, right: M, top: M, bottom: 20 }, theme: "grid",
-      head: [["Cant.", "Descripción", "Medidas"]],
-      body: items.map(function (it) { return [it.cant, it.desc, it.med]; }),
-      foot: [[String(Math.round(total * 100) / 100).replace(".", ","), "Total de bultos", ""]],
+      head: [["Descripción", "Medidas", "Cant."]],
+      body: items.map(function (it) { return [it.desc, it.med, it.cant]; }),
+      foot: [["Total de bultos", "", String(Math.round(total * 100) / 100).replace(".", ",")]],
       showFoot: "lastPage",
       styles: { font: "helvetica", fontSize: 10, textColor: INK, lineColor: LINE, lineWidth: 0.25, cellPadding: 2.4, valign: "middle", overflow: "linebreak" },
       headStyles: { fillColor: INK, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 9 },
       footStyles: { fillColor: SOFT, textColor: INK, fontStyle: "bold" },
       alternateRowStyles: { fillColor: [250, 250, 248] },
-      columnStyles: { 0: { cellWidth: 18, halign: "center" }, 2: { cellWidth: 52 } },
-      didParseCell: function (h) { if (h.column.index === 0 && (h.section === "head" || h.section === "foot")) h.cell.styles.halign = "center"; }
+      columnStyles: { 1: { cellWidth: 52 }, 2: { cellWidth: 18, halign: "center" } },
+      didParseCell: function (h) { if (h.column.index === 2 && (h.section === "head" || h.section === "foot")) h.cell.styles.halign = "center"; }
     });
     y = doc.lastAutoTable.finalY + 6;
 
     // Firma (al pie de la última hoja)
-    var SIG_H = 40, sigY = 297 - 20 - SIG_H;
+    var SIG_H = 54, sigY = 297 - 20 - SIG_H;
     if (y > sigY) { doc.addPage(); }
     var top = sigY;
     doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor.apply(doc, INK);
     doc.text("Recibí conforme la mercadería detallada, bien embalada, en buen estado y en las cantidades indicadas.", M, top + 4);
-    var lineY = top + 28, gap = 24, cw = (CW - gap) / 2;
+    var lineY = top + 42, gap = 24, cw = (CW - gap) / 2;
     ["Firma", "Aclaración"].forEach(function (lab, i) {
       var x = M + i * (cw + gap);
       doc.setDrawColor.apply(doc, INK); doc.setLineWidth(0.3); doc.line(x, lineY, x + cw, lineY);
@@ -791,7 +792,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     return false;
   }
 
-  $("addItem").addEventListener("click", function () { addItem().querySelector(".qty").focus(); changed(); });
+  $("addItem").addEventListener("click", function () { addItem().querySelector(".desc").focus(); changed(); });
   document.addEventListener("input", function (e) { if (e.target.classList) e.target.classList.remove("bad"); changed(); });
   $("duplicado").addEventListener("change", changed);
 
